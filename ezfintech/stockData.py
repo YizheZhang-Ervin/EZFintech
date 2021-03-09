@@ -4,7 +4,6 @@ __Author__      =  'Yizhe Zhang'
 __WebSite__     = 'http://ervinzhang.pythonanywhere.com/'
 
 import pandas as pd
-import numpy as np
 import requests
 
 def getStockByDay(stockCode,day="today",source="126"):
@@ -36,6 +35,7 @@ def getStockByYear(stockCode,year="2020",adjust="klinederc",source="126"):
         adjust: "kline" / "klinederc"  # 不复权 / 复权
     """
     try:
+        # 年数据
         if len(stockCode)<7:
             stockCode = "0"+stockCode
 
@@ -43,8 +43,9 @@ def getStockByYear(stockCode,year="2020",adjust="klinederc",source="126"):
         r = requests.get(url)
         rst = eval(r.text)
         rst2 = pd.DataFrame(rst["data"])
-        rst2.columns = ["time","Price1","Price2","Price3","Price4","Volume","Rate"]
-        rst2.set_index("time",inplace=True)
+        rst2.columns = ["Date","Open","High","Low","Close","Volume","Rate"]
+        rst2.set_index("Date",inplace=True)
+        rst2.index =pd.to_datetime(rst2.index)
         return rst2
     except Exception:
         print("Stock Parameters Error or Stock Server Error")
@@ -68,6 +69,8 @@ def getStockByPeriod(stockCode,period="week",adjust="klinederc",source="126"):
             rst2 = pd.DataFrame.from_dict(rst)
             rst2 = rst2[["times","closes"]]
             rst2.set_index("times",inplace=True)
+            rst2.index.name = "Date"
+            rst2.index =pd.to_datetime(rst2.index)
             return rst2
 
         elif source=="stockstar":
@@ -87,8 +90,9 @@ def getStockByPeriod(stockCode,period="week",adjust="klinederc",source="126"):
             r = requests.get(url)
             rst = eval(r.text[31:-1].replace("true","True"))
             rst2 = pd.DataFrame(rst["datas"])
-            rst2.columns = ["time","1","2","3","4","5","6","7","8","9"]
-            rst2.set_index("time",inplace=True)
+            rst2.columns = ["Date","1","2","3","4","5","6","7","8","9"]
+            rst2.set_index("Date",inplace=True)
+            rst2.index =pd.to_datetime(rst2.index)
             return rst2
         else:
             return "No this source"
@@ -113,6 +117,7 @@ def getStockByTwoDate(stockCode,startDate="20210101",endDate="20210202",source="
         rst2 = pd.DataFrame(rst["hq"])
         rst2.columns = ["time","1","2","3","4","5","6","7","8","9"]
         rst2.set_index("time",inplace=True)
+        rst2.index =pd.to_datetime(rst2.index)
         return rst2
     except Exception:
         print("Stock Parameters Error or Stock Server Error")
