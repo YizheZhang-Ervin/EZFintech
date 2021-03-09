@@ -1,9 +1,9 @@
-# ezfintech
-_____
+# EZFintech
+Pypi: ezfintech  
   
 ## Introduction  
-沪深股票数据API:
-- 数据  
+沪深股票数据  
+- 数据API  
     日数据(当日、4日数据)  
     年数据(一年的数据)  
     周期数据(日/周/月数据)  
@@ -14,12 +14,8 @@ _____
 - 数据可视化: K线图,回归分析,相关性分析  
 - 股票金融相关知识    
   
-_____
-  
 ## 依赖包  
-pandas,requests,mplfinance  
-  
-_____
+numpy,pandas,matplotlib,requests,mplfinance  
   
 ## 使用方式
 ### 安装  
@@ -38,7 +34,7 @@ stockCode:"XXXXXXX"
 day: "today" / "4d"  
 source: "126"  
   
-## 年数据  
+### 年数据  
 ezd.getStockByYear(stockCode,year="2020",adjust="klinederc",source="126")  
 stockCode:"XXXXXXX"
 year: "YYYY"   
