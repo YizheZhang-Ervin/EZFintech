@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="ezfintech",
-    version="0.0.31",
+    version="0.0.32",
     author="Yizhe Zhang",
     author_email="ervinzhang319@gmail.com",
     description="get stock data from different APIs and Analyze Stock Data",
@@ -15,8 +15,8 @@ setup(
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://github.com/YizheZhang-Ervin/EZFintech",
-    packages=find_packages(),
-    install_requires=["numpy","pandas","matplotlib","requests","mplfinance"],
+    packages = find_packages(),
+    install_requires=["numpy","pandas","matplotlib","requests","mplfinance","pandas_datareader","tensorflow"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

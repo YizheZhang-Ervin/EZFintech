@@ -5,6 +5,7 @@ __WebSite__     = 'http://ervinzhang.pythonanywhere.com/'
 
 import pandas as pd
 import requests
+from pandas_datareader import DataReader
 
 def getStockByDay(stockCode,day="today",source="126"):
     """
@@ -121,3 +122,34 @@ def getStockByTwoDate(stockCode,startDate="20210101",endDate="20210202",source="
         return rst2
     except Exception:
         print("Stock Parameters Error or Stock Server Error")
+
+def getFamaFrenchFactors(ffType="3factors",startDate="",endDate=""):
+    """
+        ffType: 3factors/5factors
+        startDate: "YYYY-MM-DD"
+        endDate: "YYYY-MM-DD"
+    """
+    # process time
+    def _dateProcess(startDate,endDate,data):
+        if startDate=="":
+            startDate = data.index.min()
+        if endDate=="":
+            endDate = data.index.max()
+        if type(startDate) != pd._libs.tslibs.timestamps.Timestamp:
+            startDate = datetime.strptime(startDate,'%Y-%m-%d')
+        if type(endDate) != pd._libs.tslibs.timestamps.Timestamp:
+            endDate = datetime.strptime(endDate,'%Y-%m-%d')
+        return startDate,endDate
+
+    if ffType=="3factors":
+        f3 = DataReader('F-F_Research_Data_Factors_daily', 'famafrench')[0]
+        startDate,endDate = _dateProcess(startDate,endDate,f3)
+        factors2 = f3.loc[(f3.index>startDate) & (f3.index<endDate)]
+        factors2 = factors2[["Mkt-RF","SMB","HML"]]
+        return factors2.copy()
+    elif ffType=="5factors":
+        f5 = DataReader('F-F_Research_Data_5_Factors_2x3_daily', 'famafrench')[0]
+        startDate,endDate = _dateProcess(startDate,endDate,f5)
+        factors1 = f5.loc[(f5.index>startDate) & (f5.index<endDate)]
+        factors1 = factors1[["Mkt-RF","SMB","HML","RMW","CMA"]]
+        return factors1.copy()

@@ -9,7 +9,7 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 
-def dateProcess(startDate,endDate,data):
+def _dateProcess(startDate,endDate,data):
     if startDate=="":
         startDate = data.index.min()
     if endDate=="":
@@ -20,32 +20,10 @@ def dateProcess(startDate,endDate,data):
         endDate = datetime.strptime(endDate,'%Y-%m-%d')
     return startDate,endDate
 
-def dataConcat(stock1,stock2):
+def _dataConcat(stock1,stock2):
     data = pd.concat([stock1["Close"],stock2["Close"]],axis=1)
     data.columns = ["stock1","stock2"]
     return data
-
-def plotKLine(data,movingAvg=(3,6,9),plotType="candle",startDate="",endDate=""):
-    """
-        data: pd.DataFrame with Date(index), Open/High/Low/Close/Volume(Columns)
-        movingAvg: (period1,period2,period3...) or period1   # 移动平均时间
-        plotType: "candle" / "line" / "renko" / "pnf"
-        startDate: "YYYY-MM-DD"
-        endDate: "YYYY-MM-DD"
-    """
-    try:
-        startDate,endDate = dateProcess(startDate,endDate,data)
-        data2 = data[["Open","High","Low","Close","Volume"]][startDate:endDate]
-        mpf.plot(data2,type=plotType,mav=movingAvg,volume=True,show_nontrading=True)
-    except KeyError:
-        print("KeyError: 请检查数据是否包含Date索引+OHLCV五列")
-    except ValueError:
-        print("ValueError: 请检查开始、结束日期格式是否为YYYY-MM-DD")
-    except TypeError:
-        print('TypeError: 请检查图表类型是否为"candle" / "line" / "renko" / "pnf"')
-        print('TypeError: 请检查移动平均是否为(period1,period2,period3...)或period1')
-    except Exception:
-        print("Something wrong with stock data")
 
 def regressionAnalysis(stock1,stock2,startDate="",endDate="",regressDeg=1):
     """
@@ -56,13 +34,14 @@ def regressionAnalysis(stock1,stock2,startDate="",endDate="",regressDeg=1):
     """
 
     # 数据合并
-    data = dataConcat(stock1,stock2)
+    data = _dataConcat(stock1,stock2)
     # 日期处理
-    startDate,endDate = dateProcess(startDate,endDate,data)
+    startDate,endDate = _dateProcess(startDate,endDate,data)
     # 数据趋势图
     print("(1)数据趋势图")
     data.loc[startDate:endDate].plot(secondary_y="stock2",figsize=(10,6))
     plt.show()
+
     # 股票之间变化情况
     rst = np.log(data/data.shift(1))
     # kde图
@@ -92,9 +71,9 @@ def correlationAnalysis(stock1,stock2,startDate="",endDate="",movingAvg=5):
     if movingAvg>len(stock1)-1:
         return "Moving Average Exceed!"
     # 数据合并
-    data = dataConcat(stock1,stock2)
+    data = _dataConcat(stock1,stock2)
     # 日期处理
-    startDate,endDate = dateProcess(startDate,endDate,data)
+    startDate,endDate = _dateProcess(startDate,endDate,data)
     # 数据与前一天相除
     rst = np.log(data/data.shift(1))
     # 去除NaN
