@@ -8,6 +8,7 @@ import mplfinance as mpf
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats as ss
 
 def _dateProcess(startDate,endDate,data):
     if startDate=="":
@@ -25,7 +26,7 @@ def _dataConcat(stock1,stock2):
     data.columns = ["stock1","stock2"]
     return data
 
-def regressionAnalysis(stock1,stock2,startDate="",endDate="",regressDeg=1):
+def regression2Stocks(stock1,stock2,startDate="",endDate="",regressDeg=1):
     """
         stock1/stock2: pd.DataFrame with Date(index), Open/High/Low/Close/Volume(Columns)
         startDate: "YYYY-MM-DD"
@@ -60,7 +61,7 @@ def regressionAnalysis(stock1,stock2,startDate="",endDate="",regressDeg=1):
     ax.plot(rst["stock1"],np.polyval(reg,rst["stock1"]),"r")
     plt.show()
 
-def correlationAnalysis(stock1,stock2,startDate="",endDate="",movingAvg=5):
+def correlation2Stocks(stock1,stock2,startDate="",endDate="",movingAvg=5):
     """
         stock1/stock2: pd.DataFrame with Date(index), Open/High/Low/Close/Volume(Columns)
         startDate: "YYYY-MM-DD"
@@ -85,3 +86,44 @@ def correlationAnalysis(stock1,stock2,startDate="",endDate="",movingAvg=5):
     print("(2)相关系数随年份变化的情况")
     rst["stock1"].rolling(movingAvg).corr(rst["stock2"]).plot(figsize=(10,6))
     plt.show()
+
+def OLS(X,Y):
+    """
+    Y: T x 1
+    X: T x N
+    """
+    T = Y.shape[0]
+    N = X.shape[1]
+
+    # 回归
+    invXX = np.linalg.inv(X.transpose()@X)
+    beta_hat = invXX@X.transpose()@Y
+    y_hat = X@beta_hat
+
+    # 模型评估  
+    residuals = Y - y_hat        
+    sigma2 = (1/T)*(residuals.transpose()@residuals)
+    sig = np.sqrt(sigma2) 
+    varcov_beta_hat = (sigma2)*invXX
+    var_beta_hat = np.sqrt(T*np.diag(varcov_beta_hat))
+    R_square = 1 - residuals.transpose()@residuals/(T*np.var(Y))
+    adj_R_square = 1-(1-R_square)*(T-1)/(T-N)
+    t_stat = beta_hat.transpose()/var_beta_hat
+    p_val_t = 1-ss.norm.cdf(t_stat)
+    F_stat = beta_hat.transpose()@varcov_beta_hat@beta_hat/(residuals.transpose()@residuals)
+    p_val_F = 1-ss.chi2.cdf(F_stat,T-N)
+
+    # 结果输出
+    reportDict = {}
+    keys = ["beta","t_stat","p_val",'Joint significance of all coefficients',
+               "R-Square",'Adjusted R Square','Standard Error','Observations'
+            ]
+    values = [beta_hat,t_stat,p_val_t,[F_stat,p_val_F],[R_square],[adj_R_square],[sig],[T]]
+    for i in range(8):
+        curLen = len(values[i])
+        lis = [np.NaN]*len(beta_hat)
+        lis[:curLen] = values[i]
+        reportDict[keys[i]] = lis
+    report = pd.DataFrame.from_dict(reportDict)
+    
+    return report,beta_hat,y_hat

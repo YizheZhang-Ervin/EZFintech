@@ -1,14 +1,14 @@
 import tensorflow as tf
 
-class EZLSTM(tf.keras.layers.Layer):
+class EZ_LSTM(tf.keras.layers.Layer):
     """
-        Input: [batchSize，sequenceLength，inputSize]
-        Output: [batchSize，sequenceLength，outputSize]
-        Output2: [batchSize，sequenceLength]
+        Input: [batchSize,sequenceLength,inputSize]
+        Output: [batchSize,sequenceLength,outputSize]
+        Output2: [batchSize,sequenceLength]
     """
     
-    def __init__(self,outputSize,returnSequence=False):
-        super(EZ_LSTM,self).__init__()
+    def __init__(self,outputSize,returnSequence=False,units=50):
+        super(EZ_LSTM,self).__init__(units)
         self.outputSize = outputSize
         self.returnSequence = returnSequence
         
@@ -31,6 +31,7 @@ class EZLSTM(tf.keras.layers.Layer):
         self.bc = self.add_weight("bc",shape=(1,self.outputSize))
         
     def call(self,x):
+        sequenceLength = x.shape[1]
         sequenceOutputs = []
         for i in range(sequenceLength):
             if i==0:

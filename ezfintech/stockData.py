@@ -6,6 +6,7 @@ __WebSite__     = 'http://ervinzhang.pythonanywhere.com/'
 import pandas as pd
 import requests
 from pandas_datareader import DataReader
+from datetime import datetime
 
 def getStockByDay(stockCode,day="today",source="126"):
     """

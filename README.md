@@ -122,19 +122,25 @@ returnData: True/False
 #### (3) 股票数据分析
 _____  
   
-- 回归分析   
-```
-eza.plotKLine(data,movingAvg=(3,6,9),plotType="candle",startDate="",endDate="")  
-data: pd.Dataframe  
-movingAvg: (period1,period2,period3...) or period1  
-plotType: "candle" / "line" / "renko" / "pnf"  
+- 双股票回归分析   
+```  
+eza.regression2Stocks(stock1,stock2,startDate="",endDate="",regressDeg=1)  
+stock1/stock2: pd.DataFrame with Date(index), Open/High/Low/Close/Volume(Columns)  
 startDate: "YYYY-MM-DD"  
 endDate: "YYYY-MM-DD"  
-```
+regressDeg: num  # 线性回归的次方  
+```  
   
-- 相关性分析  
-```
-eza.regressionAnalysis(stock1,stock2,startDate="",endDate=""):
+- 自定义OLS分析   
+```  
+eza.OLS(X,Y)  
+Y: T x 1  
+X: T x N  
+```  
+  
+- 双股票相关性分析  
+```  
+eza.correlation2Stocks(stock1,stock2,startDate="",endDate="")  
 stock1/stock2: pd.DataFrame  
 startDate: "YYYY-MM-DD"  
 endDate: "YYYY-MM-DD"  
